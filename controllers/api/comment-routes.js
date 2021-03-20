@@ -1,8 +1,32 @@
 const router = require('express').Router();
 const { Comment } = require('../../models');
 
-router.get('/', (req, res) => {
 
+router.get("/", (req, res) => {
+  console.log("======================");
+  // find all comments
+  Comment.findAll({
+      attributes: [
+          "id",
+          "comment_text",
+          "user_id",
+          "post_id"
+      ],
+      // putting comments in order of most recent first
+      order: [["created_at", "DESC"]],
+      // include username of comment author
+      include: [
+          {
+              model: User,
+              attributes: ["username"]
+          }
+      ]
+  })
+      .then(dbCommentData => res.json(dbCommentData))
+      .catch(err => {
+          console.log(err);
+          res.status(500).json(err);
+      });
 });
 
 router.post('/', (req, res) => {
